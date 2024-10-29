@@ -22,16 +22,15 @@ public class ReportService {
     public Set<String> parseUniqueProducts(MultipartFile file) throws IOException {
         Set<String> uniqueProducts = new HashSet<>();
         log.info("Метод использован");
-        // Открываем Excel файл
+
         try (InputStream inputStream = file.getInputStream();
              Workbook workbook = new XSSFWorkbook(inputStream)) {
 
-            // Предполагаем, что данные находятся на первом листе
             Sheet sheet = workbook.getSheetAt(0);
 
-            // Находим индекс колонки "Название"
+
             int productNameColumnIndex = -1;
-            Row headerRow = sheet.getRow(0); // Первая строка - заголовки
+            Row headerRow = sheet.getRow(0);
             for (Cell cell : headerRow) {
                 if ("Название".equalsIgnoreCase(cell.getStringCellValue().trim())) {
                     productNameColumnIndex = cell.getColumnIndex();
@@ -44,7 +43,6 @@ public class ReportService {
                 throw new IllegalArgumentException("Колонка 'Название' не найдена в файле.");
             }
 
-            // Проходим по строкам и добавляем уникальные названия товаров в Set
             for (int i = 1; i <= sheet.getLastRowNum(); i++) {
                 Row row = sheet.getRow(i);
                 if (row != null) {

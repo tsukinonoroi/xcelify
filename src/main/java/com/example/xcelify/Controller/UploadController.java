@@ -32,10 +32,9 @@ public class UploadController {
         List<String> uniqueProducts = new ArrayList<>(uniqueProductSet);
         model.addAttribute("uniqueProducts", uniqueProducts);
 
-        return "enter_costs"; // Вернет шаблон input-costs.ftlh для ввода себестоимости
+        return "enter_costs";
     }
 
-    // Показ формы для ввода себестоимости
     @GetMapping("/enter_costs")
     public String showInputCostsForm() {
         return "enter_costs";
