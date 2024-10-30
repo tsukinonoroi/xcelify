@@ -24,7 +24,6 @@ public class UploadController {
     @Autowired
     private final ReportService reportService;
 
-    // Обработка загрузки отчета
     @PostMapping("/upload")
     public String handleFileUpload(@RequestParam("report") MultipartFile file, Model model) throws IOException {
         Set<String> uniqueProductSet = reportService.parseUniqueProducts(file);
