@@ -1,6 +1,8 @@
 package com.example.xcelify.Controller;
 
+import com.example.xcelify.Model.Product;
 import com.example.xcelify.Model.Report;
+import com.example.xcelify.Repository.ProductRepository;
 import com.example.xcelify.Service.ReportService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,21 +23,22 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class UploadController {
 
-    @Autowired
     private final ReportService reportService;
+    private final ProductRepository productRepository;
 
     @PostMapping("/upload")
-    public String handleFileUpload(@RequestParam("report") MultipartFile file, Model model) throws IOException {
-        Set<String> uniqueProductSet = reportService.parseUniqueProducts(file);
-
-        List<String> uniqueProducts = new ArrayList<>(uniqueProductSet);
-        model.addAttribute("uniqueProducts", uniqueProducts);
-
+    public String uploadFile(@RequestParam("file") MultipartFile file, Model model) throws IOException {
+        Set<Product> productsWithCosts = reportService.parseUniqueProducts(file);
+        model.addAttribute("products", productsWithCosts);
         return "enter_costs";
     }
 
+
     @GetMapping("/enter_costs")
-    public String showInputCostsForm() {
+    public String enterCosts(Model model) {
+
+        List<Product> products = (List<Product>) model.getAttribute("products");
+        model.addAttribute("products", products);
         return "enter_costs";
     }
 }

@@ -1,0 +1,70 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background-color: #ffffff;
+    color: #333333;
+}
+
+.container {
+    max-width: 600px;
+    margin: 3em auto;
+    padding: 2em;
+    border: 1px solid #dcdcdc;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: #f9f9f9;
+}
+
+h1 {
+    color: #2E8B57;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1.5em;
+}
+
+table th, table td {
+    border: 1px solid #dcdcdc;
+    padding: 10px;
+    text-align: left;
+}
+
+table th {
+    background-color: #2E8B57;
+    color: #ffffff;
+}
+
+table tr {
+    transition: background-color 0.3s;
+}
+
+table tr:hover {
+    background-color: #e6f9e6; /* Светло-зеленый фон при наведении */
+}
+
+table tr:nth-child(even) {
+    background-color: #f2f2f2; /* Светло-серый фон для четных строк */
+}
+
+input[type="number"] {
+    width: 80%; /* Занять всю ширину ячейки */
+    padding: 0.5em;
+    font-size: 1em;
+    color: #333333;
+}
+
+input[type="submit"] {
+    margin-top: 1.5em;
+    padding: 0.7em 1.5em;
+    font-size: 1.1em;
+    font-weight: bold;
+    background-color: #2E8B57;
+    color: #ffffff;
+    border: none;
+    cursor: pointer;
+}
+
+input[type="submit"]:hover {
+    background-color: #1d5a38;
+}

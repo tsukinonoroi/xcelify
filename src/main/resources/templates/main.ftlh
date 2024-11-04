@@ -21,10 +21,11 @@
 
     <div class="upload-area" id="upload-area">
         <form action="/upload" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
             <label for="file-upload" class="file-upload-label">
-                Перетащите файл сюда или нажмите для выбора
+                Выберите файл
             </label>
-            <input id="file-upload" type="file" name="report" accept=".xlsx, .xls" required>
+            <input id="file-upload" type="file" name="file" accept=".xlsx, .xls" required>
             <input type="submit" value="Отправить">
         </form>
     </div>
