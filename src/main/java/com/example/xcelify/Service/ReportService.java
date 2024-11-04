@@ -86,4 +86,8 @@ public class ReportService {
         productRepository.saveAll(uniqueProducts);
         return uniqueProducts;
     }
+
+    public void updateCostInProduct() {
+        //TODO
+    }
 }

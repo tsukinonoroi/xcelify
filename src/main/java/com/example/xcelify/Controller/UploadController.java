@@ -35,8 +35,9 @@ public class UploadController {
     }
 
 
-    @GetMapping("/enter_costs")
+    @GetMapping("/upload")
     public String enterCosts() {
         return "enter_costs";
     }
+    
 }
