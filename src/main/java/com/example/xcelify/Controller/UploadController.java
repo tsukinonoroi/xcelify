@@ -29,16 +29,14 @@ public class UploadController {
     @PostMapping("/upload")
     public String uploadFile(@RequestParam("file") MultipartFile file, Model model) throws IOException {
         Set<Product> productsWithCosts = reportService.parseUniqueProducts(file);
-        model.addAttribute("products", productsWithCosts);
+        List<Product> products = new ArrayList<>(productsWithCosts);
+        model.addAttribute("products", products);
         return "enter_costs";
     }
 
 
     @GetMapping("/enter_costs")
-    public String enterCosts(Model model) {
-
-        List<Product> products = (List<Product>) model.getAttribute("products");
-        model.addAttribute("products", products);
+    public String enterCosts() {
         return "enter_costs";
     }
 }
