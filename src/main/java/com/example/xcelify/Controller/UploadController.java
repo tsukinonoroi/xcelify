@@ -34,10 +34,13 @@ public class UploadController {
         return "enter_costs";
     }
 
-
-    @GetMapping("/upload")
+    @GetMapping("/enter_costs")
     public String enterCosts() {
         return "enter_costs";
     }
-    
+
+    @PostMapping("/updateCosts")
+    public String updateCosts() {
+        return "redirect:/enter_costs";
+    }
 }

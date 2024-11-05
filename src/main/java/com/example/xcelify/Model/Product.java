@@ -32,12 +32,5 @@ public class Product {
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     private List<ProductHistory> history;
 
-    public void updateCost(Double newCost) {
-        if (this.cost == null || !this.cost.equals(newCost)) {
-            this.cost = newCost;
-            this.updateCost = LocalDateTime.now();
-            ProductHistory productHistory = new ProductHistory(this, newCost, this.updateCost);
-            this.history.add(productHistory);
-        }
-    }
+
 }
