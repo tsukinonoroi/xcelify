@@ -1,11 +1,10 @@
 package com.example.xcelify.Controller;
 
 import com.example.xcelify.Model.Product;
-import com.example.xcelify.Model.Report;
 import com.example.xcelify.Repository.ProductRepository;
 import com.example.xcelify.Service.ReportService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,10 +14,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
+@Slf4j
 @Controller
 @RequiredArgsConstructor
 public class UploadController {
@@ -40,7 +38,28 @@ public class UploadController {
     }
 
     @PostMapping("/updateCosts")
-    public String updateCosts() {
+    public String updateCosts(@RequestParam Map<String, String> allParams) {
+        Map<Long, Double> costsMap = new HashMap<>();
+
+        log.debug("Received parameters: {}", allParams);
+
+        allParams.forEach((key, value) -> {
+            if (key.startsWith("costs[")) {
+                String idString = key.substring(6, key.length() - 1);
+                try {
+                    Long productId = Long.valueOf(idString.trim().replaceAll("[^\\d]", "")); // Удаляем пробелы из ID
+                    Double cost = Double.valueOf(value.replaceAll("[^\\d.]", "").replace(",", ".")); // Обрабатываем стоимость
+
+                    log.debug("Adding product ID: {}, cost: {}", productId, cost);
+
+                    costsMap.put(productId, cost);
+                } catch (NumberFormatException e) {
+                    log.warn("Неверный формат ID или стоимости: ID={}, стоимость={}", idString, value);
+                }
+            }
+        });
+        reportService.updateCosts(costsMap);
+
         return "redirect:/enter_costs";
     }
 }

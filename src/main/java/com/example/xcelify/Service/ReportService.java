@@ -1,21 +1,24 @@
 package com.example.xcelify.Service;
-
 import com.example.xcelify.Model.Product;
 import com.example.xcelify.Repository.ProductRepository;
 import com.example.xcelify.Repository.ReportRepository;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.time.LocalDateTime;
+
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 @Slf4j
@@ -25,6 +28,7 @@ public class ReportService {
 
     private final ReportRepository reportRepository;
     private final ProductRepository productRepository;
+
     @Transactional
     public Set<Product> parseUniqueProducts(MultipartFile file) throws IOException {
         Set<Product> uniqueProducts = new HashSet<>();
@@ -72,10 +76,16 @@ public class ReportService {
                             : "";
 
                     if (!name.isEmpty() && !articul.isEmpty()) {
-                        Product product = new Product();
-                        product.setName(name);
-                        product.setArticul(articul);
-                        uniqueProducts.add(product);
+                        Product existingProduct = productRepository.findByArticul(articul);
+                        if (existingProduct != null) {
+                            existingProduct.setName(name);
+                            uniqueProducts.add(existingProduct);
+                        } else {
+                            Product newProduct = new Product();
+                            newProduct.setName(name);
+                            newProduct.setArticul(articul);
+                            uniqueProducts.add(newProduct);
+                        }
                     } else {
                         log.warn("Пропущена строка: Название = '{}', Артикул = '{}'", name, articul);
                     }
@@ -88,28 +98,20 @@ public class ReportService {
     }
 
     @Transactional
-    public void updateProductCosts(Map<String, String> costs) {
-        // Проходим по всем записям в карте costs, где ключ — это id продукта, а значение — новая себестоимость
-        costs.forEach((idStr, costStr) -> {
-            try {
-                // Преобразуем id продукта из String в Long
-                Long productId = Long.parseLong(idStr);
-                // Преобразуем себестоимость из String в Double
-                Double newCost = Double.parseDouble(costStr);
+    public void updateCosts(Map<Long, Double> costsMap) {
+        for (Map.Entry<Long, Double> entry : costsMap.entrySet()) {
+            Long productId = entry.getKey();
+            Double newCost = entry.getValue();
 
-                // Ищем продукт в базе данных по id
-                productRepository.findById(productId).ifPresent(product -> {
-                    // Обновляем поля стоимости и времени обновления
-                    product.setCost(newCost);
-                    product.setUpdateCost(LocalDateTime.now());
-
-                    // Сохраняем обновленный продукт в базе данных
-                    productRepository.save(product);
-                });
-            } catch (NumberFormatException e) {
-                // Обработка исключений на случай, если id или себестоимость не смогут быть преобразованы в числа
-                System.err.println("Ошибка при преобразовании данных: " + e.getMessage());
+            Optional<Product> optionalProduct = productRepository.findById(productId);
+            if (optionalProduct.isPresent()) {
+                Product product = optionalProduct.get();
+                product.setCost(newCost);
+                productRepository.save(product);
+            } else {
+                log.warn("Продукт не найден с ID: {}", productId);
             }
-        });
+        }
     }
 }
+

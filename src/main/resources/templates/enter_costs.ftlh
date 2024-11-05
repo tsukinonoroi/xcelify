@@ -11,7 +11,8 @@
     <h1>Введите себестоимость для продуктов</h1>
 
     <#if products?has_content>
-        <form action="/save_costs" method="post">
+        <form action="/updateCosts" method="post">
+            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
             <table>
                 <thead>
                 <tr>
@@ -22,20 +23,19 @@
                 </thead>
                 <tbody>
                 <#list products as product>
-                    <tr>
-                        <td>${product.name}</td>
-                        <td>${product.articul}</td>
-                        <td>
-                            <input type="number" name="costs[${product.id}]" step="0.01" required>
-                        </td>
-                    </tr>
-                </#list>
+                <tr>
+                    <td>${product.name}</td>
+                    <td>${product.articul}</td>
+                    <td>
+                        <input type="hidden" name="productId" value="${product.id}"> <!-- Добавлено скрытое поле для productId -->
+                        <input type="number" name="costs[${product.id}]" step="0.01" value="${product.costs?default('')}" required>
+                    </td>
+                </tr>
+                </</#list>
                 </tbody>
             </table>
             <input type="submit" value="Сохранить себестоимости">
         </form>
-    <#else>
-        <p>Нет продуктов для ввода себестоимости.</p>
     </#if>
 </div>
 </body>
