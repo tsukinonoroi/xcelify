@@ -33,8 +33,10 @@ public class UploadController {
     }
 
     @GetMapping("/enter_costs")
-    public String enterCosts() {
-        return "enter_costs";
+    public String enterCosts(Model model) {
+        List<Product> products = productRepository.findAll(); // Загружаем все продукты из базы
+        model.addAttribute("products", products); // Передаем список продуктов в модель
+        return "enter_costs"; // Название вашего шаблона
     }
 
     @PostMapping("/updateCosts")

@@ -14,25 +14,21 @@
         <form action="/updateCosts" method="post">
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
             <table>
-                <thead>
                 <tr>
+                    <th>ID</th>
                     <th>Название</th>
-                    <th>Артикул поставщика</th>
                     <th>Себестоимость</th>
                 </tr>
-                </thead>
-                <tbody>
                 <#list products as product>
-                <tr>
-                    <td>${product.name}</td>
-                    <td>${product.articul}</td>
-                    <td>
-                        <input type="hidden" name="productId" value="${product.id}"> <!-- Добавлено скрытое поле для productId -->
-                        <input type="number" name="costs[${product.id}]" step="0.01" value="${product.costs?default('')}" required>
-                    </td>
-                </tr>
-                </</#list>
-                </tbody>
+                    <tr>
+                        <td>${product.id}</td>
+                        <td>${product.name}</td>
+                        <td>
+                            <input type="text" name="costs[${product.id}]"
+                                   value="${product.cost?if_exists}" /> 
+                        </td>
+                    </tr>
+                </#list>
             </table>
             <input type="submit" value="Сохранить себестоимости">
         </form>
