@@ -16,6 +16,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.io.IOException;
 import java.io.InputStream;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
@@ -107,6 +108,7 @@ public class ReportService {
             if (optionalProduct.isPresent()) {
                 Product product = optionalProduct.get();
                 product.setCost(newCost);
+                product.setUpdateCost(LocalDateTime.now());
                 productRepository.save(product);
             } else {
                 log.warn("Продукт не найден с ID: {}", productId);
