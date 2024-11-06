@@ -34,9 +34,9 @@ public class UploadController {
 
     @GetMapping("/enter_costs")
     public String enterCosts(Model model) {
-        List<Product> products = productRepository.findAll(); // Загружаем все продукты из базы
-        model.addAttribute("products", products); // Передаем список продуктов в модель
-        return "enter_costs"; // Название вашего шаблона
+        List<Product> products = productRepository.findAll(); 
+        model.addAttribute("products", products); 
+        return "enter_costs";
     }
 
     @PostMapping("/updateCosts")
@@ -50,7 +50,7 @@ public class UploadController {
                 String idString = key.substring(6, key.length() - 1);
                 try {
                     Long productId = Long.valueOf(idString.trim().replaceAll("[^\\d]", "")); // Удаляем пробелы из ID
-                    Double cost = Double.valueOf(value.replaceAll("[^\\d.]", "").replace(",", ".")); // Обрабатываем стоимость
+                    Double cost = Double.valueOf(value.replaceAll("[^\\d.]", "").replace(",", ".")); 
 
                     log.debug("Adding product ID: {}, cost: {}", productId, cost);
 
