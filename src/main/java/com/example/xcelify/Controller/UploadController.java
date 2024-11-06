@@ -32,13 +32,6 @@ public class UploadController {
         return "enter_costs";
     }
 
-    @GetMapping("/enter_costs")
-    public String enterCosts(Model model) {
-        List<Product> products = productRepository.findAll(); 
-        model.addAttribute("products", products); 
-        return "enter_costs";
-    }
-
     @PostMapping("/updateCosts")
     public String updateCosts(@RequestParam Map<String, String> allParams) {
         Map<Long, Double> costsMap = new HashMap<>();
