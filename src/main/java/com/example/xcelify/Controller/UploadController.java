@@ -29,11 +29,14 @@ public class UploadController {
         Set<Product> productsWithCosts = reportService.parseUniqueProducts(file);
         List<Product> products = new ArrayList<>(productsWithCosts);
 
+<<<<<<< HEAD
         model.addAttribute("products", products);
 
         return "enter_costs";
     }
 
+=======
+>>>>>>> 9c68ca91ccc4b3f7b8acb8f5ce4b18afbdd01045
     @PostMapping("/updateCosts")
     public String updateCosts(@RequestParam Map<String, String> allParams) {
         Map<Long, Double> costsMap = new HashMap<>();
@@ -45,7 +48,7 @@ public class UploadController {
                 String idString = key.substring(6, key.length() - 1);
                 try {
                     Long productId = Long.valueOf(idString.trim().replaceAll("[^\\d]", "")); // Удаляем пробелы из ID
-                    Double cost = Double.valueOf(value.replaceAll("[^\\d.]", "").replace(",", ".")); // Обрабатываем стоимость
+                    Double cost = Double.valueOf(value.replaceAll("[^\\d.]", "").replace(",", ".")); 
 
                     log.debug("Adding product ID: {}, cost: {}", productId, cost);
 
@@ -59,5 +62,9 @@ public class UploadController {
 
         return "redirect:/updateCosts";
     }
+<<<<<<< HEAD
 
 }
+=======
+}
+>>>>>>> 9c68ca91ccc4b3f7b8acb8f5ce4b18afbdd01045
