@@ -168,7 +168,7 @@ public class ReportService {
         if (!directory.exists()) {
             directory.mkdirs();
         }
-        
+
         try (FileOutputStream fileOut = new FileOutputStream(new File(directoryPath, "final_report.xlsx"))) {
             resultWorkbook.write(fileOut);
         }
