@@ -13,6 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -21,6 +23,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -32,8 +36,13 @@ public class ReportService {
 
     @Transactional
     public Set<Product> parseUniqueProducts(MultipartFile file) throws IOException {
+        long startTime = System.currentTimeMillis(); // Начало отсчёта времени
         Set<Product> uniqueProducts = new HashSet<>();
         log.info("Метод parseUniqueProducts использован");
+
+        // Загрузка всех продуктов один раз
+        Map<String, Product> existingProducts = productRepository.findAll().stream()
+                .collect(Collectors.toMap(Product::getArticul, Function.identity()));
 
         try (InputStream inputStream = file.getInputStream();
              Workbook workbook = new XSSFWorkbook(inputStream)) {
@@ -44,6 +53,7 @@ public class ReportService {
             int supplierArticulColumnIndex = -1;
             Row headerRow = sheet.getRow(0);
 
+            // Находим индексы колонок
             for (Cell cell : headerRow) {
                 String cellValue = cell.getStringCellValue().trim();
                 if ("Название".equalsIgnoreCase(cellValue)) {
@@ -63,6 +73,7 @@ public class ReportService {
                 throw new IllegalArgumentException("Колонка 'Артикул поставщика' не найдена в файле.");
             }
 
+            // Обработка строк
             for (int i = 1; i <= sheet.getLastRowNum(); i++) {
                 Row row = sheet.getRow(i);
                 if (row != null) {
@@ -77,15 +88,16 @@ public class ReportService {
                             : "";
 
                     if (!name.isEmpty() && !articul.isEmpty()) {
-                        Product existingProduct = productRepository.findByArticul(articul);
+                        Product existingProduct = existingProducts.get(articul);
                         if (existingProduct != null) {
-                            existingProduct.setName(name);
                             uniqueProducts.add(existingProduct);
                         } else {
                             Product newProduct = new Product();
                             newProduct.setName(name);
                             newProduct.setArticul(articul);
+                            productRepository.save(newProduct);
                             uniqueProducts.add(newProduct);
+                            existingProducts.put(articul, newProduct);
                         }
                     } else {
                         log.warn("Пропущена строка: Название = '{}', Артикул = '{}'", name, articul);
@@ -94,7 +106,9 @@ public class ReportService {
             }
         }
 
-        productRepository.saveAll(uniqueProducts);
+        long endTime = System.currentTimeMillis(); // Конец отсчёта времени
+        log.info("Время выполнения метода parseUniqueProducts: {} ms", (endTime - startTime));
+
         return uniqueProducts;
     }
 
@@ -114,6 +128,52 @@ public class ReportService {
                 log.warn("Продукт не найден с ID: {}", productId);
             }
         }
+    }
+
+    public void generateAndSaveReport(MultipartFile file) throws IOException {
+        Set<Product> uniqueProducts = parseUniqueProducts(file);
+
+
+        Workbook resultWorkbook = new XSSFWorkbook();
+        Sheet resultSheet = resultWorkbook.createSheet("Итоговый отчет");
+
+        Row resultHeader = resultSheet.createRow(0);
+        String[] columns = {"Название", "Артикул поставщика", "Кол-во",
+                "Вайлдберриз реализовал Товар (Пр)", "Возмещение за выдачу и возврат товаров на ПВЗ",
+                "Эквайринг/Комиссия за организацию платежей", "Вознаграждение Вайлдберриз (ВВ), без НДС",
+                "НДС с Вознаграждения Вайлдберриз", "К перечислению Продавцу за реализованный Товар",
+                "Услуги по доставке товара покупателю", "Общая сумма штрафов", "Хранение",
+                "Удержания", "Платная приемка", "к оплате", "себестоимость", "Прибыль до налогообложения"};
+        for (int j = 0; j < columns.length; j++) {
+            resultHeader.createCell(j).setCellValue(columns[j]);
+        }
+
+
+        int rowIndex = 1;
+        for (Product product : uniqueProducts) {
+            Row row = resultSheet.createRow(rowIndex++);
+            row.createCell(0).setCellValue(product.getName());
+            row.createCell(1).setCellValue(product.getArticul());
+            row.createCell(2).setCellValue(1);
+
+
+            for (int col = 3; col < columns.length; col++) {
+                row.createCell(col).setCellValue(0);
+            }
+        }
+
+
+        String directoryPath = "src/main/java/com/example/xcelify/Reports/Filter";
+        File directory = new File(directoryPath);
+        if (!directory.exists()) {
+            directory.mkdirs();
+        }
+        
+        try (FileOutputStream fileOut = new FileOutputStream(new File(directoryPath, "final_report.xlsx"))) {
+            resultWorkbook.write(fileOut);
+        }
+
+        System.out.println("Отчет успешно сохранен в " + directoryPath + "/final_report.xlsx");
     }
 }
 

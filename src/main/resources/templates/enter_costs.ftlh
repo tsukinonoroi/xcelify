@@ -25,7 +25,7 @@
                         <td>${product.name}</td>
                         <td>
                             <input type="text" name="costs[${product.id}]"
-                                   value="${product.cost?if_exists}" /> 
+                                   value="${product.cost?if_exists}" />
                         </td>
                     </tr>
                 </#list>

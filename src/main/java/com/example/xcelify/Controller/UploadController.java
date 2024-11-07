@@ -28,15 +28,10 @@ public class UploadController {
     public String uploadFile(@RequestParam("file") MultipartFile file, Model model) throws IOException {
         Set<Product> productsWithCosts = reportService.parseUniqueProducts(file);
         List<Product> products = new ArrayList<>(productsWithCosts);
-        model.addAttribute("products", products);
-        return "enter_costs";
-    }
 
-    @GetMapping("/enter_costs")
-    public String enterCosts(Model model) {
-        List<Product> products = productRepository.findAll(); // Загружаем все продукты из базы
-        model.addAttribute("products", products); // Передаем список продуктов в модель
-        return "enter_costs"; // Название вашего шаблона
+        model.addAttribute("products", products);
+
+        return "enter_costs";
     }
 
     @PostMapping("/updateCosts")
@@ -62,6 +57,7 @@ public class UploadController {
         });
         reportService.updateCosts(costsMap);
 
-        return "redirect:/enter_costs";
+        return "redirect:/updateCosts";
     }
+
 }
