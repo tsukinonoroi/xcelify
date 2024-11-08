@@ -3,17 +3,26 @@ package com.example.xcelify.Controller;
 import com.example.xcelify.Model.Product;
 import com.example.xcelify.Repository.ProductRepository;
 import com.example.xcelify.Service.ReportService;
+
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 
+import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
 import java.util.*;
 
 @Slf4j
@@ -26,14 +35,25 @@ public class UploadController {
 
     @PostMapping("/upload")
     public String uploadFile(@RequestParam("file") MultipartFile file, Model model) throws IOException {
-        Set<Product> productsWithCosts = reportService.parseUniqueProducts(file);
-        List<Product> products = new ArrayList<>(productsWithCosts);
 
+        String uploadDir = "C:\\Users\\edemw\\Desktop\\notfilter\\" + file.getOriginalFilename();
+
+        File dest = new File(uploadDir);
+
+        File parentDir = dest.getParentFile();
+        if (!parentDir.exists()) {
+            parentDir.mkdirs();
+        }
+
+        file.transferTo(dest);
+
+        Set<Product> productsWithCosts = reportService.parseUniqueProducts(dest);
+
+        List<Product> products = new ArrayList<>(productsWithCosts);
         model.addAttribute("products", products);
 
         return "enter_costs";
     }
-
     @PostMapping("/updateCosts")
     public String updateCosts(@RequestParam Map<String, String> allParams) {
         Map<Long, Double> costsMap = new HashMap<>();
@@ -59,6 +79,11 @@ public class UploadController {
 
         return "redirect:/updateCosts";
     }
-    
-}
 
+    @GetMapping("/updateCosts")
+    public String getUpdCost(Model model){
+        return "enter_costs";
+    }
+
+
+}

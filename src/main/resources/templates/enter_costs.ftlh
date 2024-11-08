@@ -32,6 +32,11 @@
             </table>
             <input type="submit" value="Сохранить себестоимости">
         </form>
+
+        <form action="/generateReport" method="post" style="margin-top: 20px;">
+            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+            <button type="submit">Сгенерировать отчет</button>
+        </form>
     </#if>
 </div>
 </body>
