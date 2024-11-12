@@ -3,15 +3,14 @@ import com.example.xcelify.Model.Product;
 import com.example.xcelify.Repository.ProductRepository;
 import com.example.xcelify.Repository.ReportRepository;
 
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.server.ResponseStatusException;
+
 
 import java.io.*;
 
@@ -23,10 +22,15 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Data
 public class ReportService {
 
     private final ReportRepository reportRepository;
     private final ProductRepository productRepository;
+    private final HelperClass helperClass;
+    private String reportName;
+    private String filePath = "C:/users/edemw/Desktop/filter";
+    private String sourceFilePath;
 
     @Transactional
     public Set<Product> parseUniqueProducts(File file) throws IOException {
@@ -34,74 +38,26 @@ public class ReportService {
         Set<Product> uniqueProducts = new HashSet<>();
         log.info("Метод parseUniqueProducts использован");
 
-        
         Map<String, Product> existingProducts = productRepository.findAll().stream()
                 .collect(Collectors.toMap(Product::getArticul, Function.identity()));
 
-
-        Map<String, Integer> soldProducts = new HashMap<>();
-
-        try (FileInputStream inputStream = new FileInputStream(file);
-             Workbook workbook = new XSSFWorkbook(inputStream)) {
-
+        try (Workbook workbook = HelperClass.loadWorkbook(file)) {
             Sheet sheet = workbook.getSheetAt(0);
 
-            int productNameColumnIndex = -1;
-            int supplierArticulColumnIndex = -1;
-            int paymentReasonColumnIndex = -1;
-            Row headerRow = sheet.getRow(0);
+            int productNameColumnIndex = HelperClass.findColumnIndex(sheet, "Название");
+            int supplierArticulColumnIndex = HelperClass.findColumnIndex(sheet, "Артикул поставщика");
 
-
-            for (Cell cell : headerRow) {
-                String cellValue = cell.getStringCellValue().trim();
-                if ("Название".equalsIgnoreCase(cellValue)) {
-                    productNameColumnIndex = cell.getColumnIndex();
-                    log.info("Найдена колонка 'Название'");
-                } else if ("Артикул поставщика".equalsIgnoreCase(cellValue)) {
-                    supplierArticulColumnIndex = cell.getColumnIndex();
-                    log.info("Найдена колонка 'Артикул поставщика'");
-                } else if ("Обоснование для оплаты".equalsIgnoreCase(cellValue)) {
-                    paymentReasonColumnIndex = cell.getColumnIndex();
-                    log.info("Найдена колонка 'Обоснование для оплаты'");
-                }
+            if (productNameColumnIndex == -1 || supplierArticulColumnIndex == -1) {
+                throw new IllegalArgumentException("Не найдены необходимые колонки в файле.");
             }
-
-            if (productNameColumnIndex == -1) {
-                throw new IllegalArgumentException("Колонка 'Название' не найдена в файле.");
-            }
-
-            if (supplierArticulColumnIndex == -1) {
-                throw new IllegalArgumentException("Колонка 'Артикул поставщика' не найдена в файле.");
-            }
-
-            if (paymentReasonColumnIndex == -1) {
-                throw new IllegalArgumentException("Колонка 'Обоснование для оплаты' не найдена в файле.");
-            }
-
 
             for (int i = 1; i <= sheet.getLastRowNum(); i++) {
                 Row row = sheet.getRow(i);
                 if (row != null) {
-                    Cell nameCell = row.getCell(productNameColumnIndex);
-                    Cell articulCell = row.getCell(supplierArticulColumnIndex);
-                    Cell paymentReasonCell = row.getCell(paymentReasonColumnIndex);
-
-                    String name = (nameCell != null && nameCell.getCellType() == CellType.STRING)
-                            ? nameCell.getStringCellValue().trim()
-                            : "";
-                    String articul = (articulCell != null && articulCell.getCellType() == CellType.STRING)
-                            ? articulCell.getStringCellValue().trim()
-                            : "";
-                    String paymentReason = (paymentReasonCell != null && paymentReasonCell.getCellType() == CellType.STRING)
-                            ? paymentReasonCell.getStringCellValue().trim()
-                            : "";
+                    String name = HelperClass.getCellStringValue(row, productNameColumnIndex);
+                    String articul = HelperClass.getCellStringValue(row, supplierArticulColumnIndex);
 
                     if (!name.isEmpty() && !articul.isEmpty()) {
-                        if ("продажа".equalsIgnoreCase(paymentReason)) {
-                            String key = name + "_" + articul;
-                            soldProducts.put(key, soldProducts.getOrDefault(key, 0) + 1);
-                        }
-
                         Product existingProduct = existingProducts.get(articul);
                         if (existingProduct != null) {
                             uniqueProducts.add(existingProduct);
@@ -113,51 +69,138 @@ public class ReportService {
                             uniqueProducts.add(newProduct);
                             existingProducts.put(articul, newProduct);
                         }
-                    } else {
-                        log.warn("Пропущена строка: Название = '{}', Артикул = '{}'", name, articul);
                     }
                 }
             }
-
-            Workbook newWorkbook = new XSSFWorkbook();
-            Sheet newSheet = newWorkbook.createSheet("Отчёт");
-
-            Row header = newSheet.createRow(0);
-            String[] headers = {"Название", "Артикул поставщика", "Количество продано"};
-            for (int i = 0; i < headers.length; i++) {
-                header.createCell(i).setCellValue(headers[i]);
-            }
-
-            int rowIndex = 1;
-            for (Product product : uniqueProducts) {
-                Row row = newSheet.createRow(rowIndex++);
-                row.createCell(0).setCellValue(product.getName());
-                row.createCell(1).setCellValue(product.getArticul());
-
-                String key = product.getName() + "_" + product.getArticul();
-                Integer soldQuantity = soldProducts.getOrDefault(key, 0);
-                row.createCell(2).setCellValue(soldQuantity);
-            }
-
-            File outputDir = new File("C:\\Users\\edemw\\Desktop\\filter");
-            if (!outputDir.exists()) {
-                outputDir.mkdirs();
-            }
-
-            String outputFilePath = outputDir.getAbsolutePath() + "\\" + "report_" + System.currentTimeMillis() + ".xlsx";
-            try (FileOutputStream fileOut = new FileOutputStream(outputFilePath)) {
-                newWorkbook.write(fileOut);
-            }
-            newWorkbook.close();
         }
 
-        long endTime = System.currentTimeMillis(); // Конец отсчёта времени
+        long endTime = System.currentTimeMillis();
         log.info("Время выполнения метода parseUniqueProducts: {} ms", (endTime - startTime));
 
         return uniqueProducts;
     }
 
+    public void generateNewReport(String reportName) throws IOException {
+        String uniqueFileName = reportName + ".xlsx";
+        File outputDir = new File(filePath);
+        if (!outputDir.exists()) {
+            outputDir.mkdirs();
+        }
 
+        String outputFilePath = outputDir.getAbsolutePath() + "/" + uniqueFileName;
+        String[] headers = {
+                "Название", "Артикул поставщика", "Кол-во",
+                "Вайлдберриз реализовал Товар (Пр)", "Возмещение за выдачу и возврат товаров на ПВЗ",
+                "Эквайринг/Комиссия за организацию платежей", "Вознаграждение Вайлдберриз (ВВ), без НДС",
+                "НДС с Вознаграждения Вайлдберриз", "К перечислению Продавцу за реализованный Товар",
+                "Услуги по доставке товара покупателю", "Общая сумма штрафов", "Хранение", "Удержания",
+                "Платная приемка", "к оплате", "себестоимость", "Прибыль до налогообложения"
+        };
+
+        Workbook workbook = HelperClass.createWorkbook(headers);
+        Sheet sheet = workbook.getSheetAt(0);
+
+        // Устанавливаем высоту строк на 30 пунктов
+        int rowHeightInPoints = 30;
+        for (int i = 0; i <= sheet.getLastRowNum(); i++) {
+            Row row = sheet.getRow(i);
+            if (row == null) {
+                row = sheet.createRow(i);
+            }
+            row.setHeightInPoints(rowHeightInPoints);
+        }
+
+        HelperClass.saveWorkbook(workbook, outputFilePath);
+
+        log.info("Отчет успешно создан: " + outputFilePath);
+    }
+
+
+    public void inputNameAndArticul(Set<Product> uniqueProducts) throws IOException {
+        String outputFilePath = filePath + "/" + reportName + ".xlsx";
+        File file = new File(outputFilePath);
+
+        if (!file.exists()) {
+            throw new FileNotFoundException("Файл отчета не найден: " + outputFilePath);
+        }
+
+        Workbook workbook = HelperClass.loadWorkbook(file);
+        Sheet sheet = workbook.getSheetAt(0);
+
+        Map<String, Object[]> data = uniqueProducts.stream().collect(Collectors.toMap(
+                Product::getArticul,
+                product -> new Object[]{product.getName(), product.getArticul()}
+        ));
+        HelperClass.writeDataToSheet(sheet, 1, data);
+        HelperClass.saveWorkbook(workbook, outputFilePath);
+
+        log.info("Отчет успешно обновлен с данными продуктов: " + outputFilePath);
+    }
+
+    public void inputCountAndSale(Set<Product> uniqueProducts) throws IOException {
+        if (sourceFilePath == null) {
+            throw new IllegalStateException("Исходный файл не установлен. Загрузите файл перед генерацией отчета.");
+        }
+        Map<String, Integer> countMap = new HashMap<>();
+        Map<String, Double> saleSumMap = new HashMap<>();
+
+        try (Workbook workbook = HelperClass.loadWorkbook(new File(sourceFilePath))) {
+            Sheet sheet = workbook.getSheetAt(0);
+
+            int nameColumnIndex = HelperClass.findColumnIndex(sheet, "Название");
+            int supplierArticulColumnIndex = HelperClass.findColumnIndex(sheet, "Артикул поставщика");
+            int saleAmountColumnIndex = HelperClass.findColumnIndex(sheet, "Вайлдберриз реализовал Товар (Пр)");
+
+            if (supplierArticulColumnIndex == -1 || saleAmountColumnIndex == -1) {
+                throw new IllegalArgumentException("Не найдены необходимые колонки в исходном файле.");
+            }
+
+            for (int i = 1; i <= sheet.getLastRowNum(); i++) {
+                Row row = sheet.getRow(i);
+                if (row != null) {
+                    String articul = HelperClass.getCellStringValue(row, supplierArticulColumnIndex);
+                    double saleAmount = row.getCell(saleAmountColumnIndex).getNumericCellValue();
+
+                    if (uniqueProducts.stream().anyMatch(product -> product.getArticul().equals(articul))) {
+                        countMap.put(articul, countMap.getOrDefault(articul, 0) + (saleAmount != 0 ? 1 : 0));
+                        saleSumMap.put(articul, saleSumMap.getOrDefault(articul, 0.0) + saleAmount);
+                    }
+                }
+            }
+        }
+
+        String outputFilePath = filePath + "/" + reportName + ".xlsx";
+        Workbook reportWorkbook;
+
+        File file = new File(outputFilePath);
+        if (file.exists()) {
+            reportWorkbook = HelperClass.loadWorkbook(file);
+        } else {
+            String[] headers = {"Название", "Артикул поставщика", "Кол-во", "Вайлдберриз реализовал товар (Пр)"};
+            reportWorkbook = HelperClass.createWorkbook(headers);
+        }
+
+        Sheet reportSheet = reportWorkbook.getSheetAt(0);
+        if (reportSheet == null) {
+            reportSheet = reportWorkbook.createSheet("Отчет");
+        }
+
+        Map<String, Object[]> reportData = new HashMap<>();
+        int rowNum = 1;
+        for (Product product : uniqueProducts) {
+            Object[] rowData = {
+                    product.getName(),
+                    product.getArticul(),
+                    countMap.getOrDefault(product.getArticul(), 0),
+                    saleSumMap.getOrDefault(product.getArticul(), 0.0)
+            };
+            reportData.put(String.valueOf(rowNum++), rowData);
+        }
+
+        HelperClass.writeDataToSheet(reportSheet, 1, reportData);
+        HelperClass.saveWorkbook(reportWorkbook, outputFilePath);
+        System.out.println("Отчет успешно обновлен с количеством и суммой продаж: " + outputFilePath);
+    }
     @Transactional
     public void updateCosts(Map<Long, Double> costsMap) {
         for (Map.Entry<Long, Double> entry : costsMap.entrySet()) {
@@ -175,7 +218,12 @@ public class ReportService {
             }
         }
     }
-
-
+    
+    public File getSourceFile() {
+        if (sourceFilePath == null) {
+            throw new IllegalStateException("Исходный файл не установлен. Загрузите файл перед генерацией отчета.");
+        }
+        return new File(sourceFilePath);
+    }
 }
 

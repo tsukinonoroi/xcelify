@@ -33,8 +33,11 @@
             <input type="submit" value="Сохранить себестоимости">
         </form>
 
+        <!-- Форма для генерации отчета с вводом названия -->
         <form action="/generateReport" method="post" style="margin-top: 20px;">
             <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+            <label for="reportName">Как назовем отчет?</label>
+            <input type="text" id="reportName" name="reportName" required/>
             <button type="submit">Сгенерировать отчет</button>
         </form>
     </#if>

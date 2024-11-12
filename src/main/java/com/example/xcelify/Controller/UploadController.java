@@ -5,6 +5,7 @@ import com.example.xcelify.Repository.ProductRepository;
 import com.example.xcelify.Service.ReportService;
 
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
@@ -28,16 +29,17 @@ import java.util.*;
 @Slf4j
 @Controller
 @RequiredArgsConstructor
+@Data
 public class UploadController {
 
     private final ReportService reportService;
     private final ProductRepository productRepository;
 
+
     @PostMapping("/upload")
     public String uploadFile(@RequestParam("file") MultipartFile file, Model model) throws IOException {
 
         String uploadDir = "C:\\Users\\edemw\\Desktop\\notfilter\\" + file.getOriginalFilename();
-
         File dest = new File(uploadDir);
 
         File parentDir = dest.getParentFile();
@@ -47,6 +49,8 @@ public class UploadController {
 
         file.transferTo(dest);
 
+        reportService.setSourceFilePath(uploadDir);
+
         Set<Product> productsWithCosts = reportService.parseUniqueProducts(dest);
 
         List<Product> products = new ArrayList<>(productsWithCosts);
@@ -54,6 +58,7 @@ public class UploadController {
 
         return "enter_costs";
     }
+
     @PostMapping("/updateCosts")
     public String updateCosts(@RequestParam Map<String, String> allParams) {
         Map<Long, Double> costsMap = new HashMap<>();
@@ -78,6 +83,24 @@ public class UploadController {
         reportService.updateCosts(costsMap);
 
         return "redirect:/updateCosts";
+    }
+
+    @PostMapping("/generateReport")
+    public String generateReport(@RequestParam("reportName") String reportName) throws IOException {
+
+        reportService.setReportName(reportName);
+        reportService.generateNewReport(reportName);
+
+        File sourceFile = reportService.getSourceFile();
+        Set<Product> uniqueProducts = reportService.parseUniqueProducts(sourceFile);
+
+        reportService.inputNameAndArticul(uniqueProducts);
+        reportService.inputCountAndSale(uniqueProducts);
+        return "generateReport";
+    }
+    @GetMapping("/generateReport")
+    public String generareReportGet() {
+        return "generateReport";
     }
 
     @GetMapping("/updateCosts")
