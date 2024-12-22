@@ -9,9 +9,9 @@ services:
     depends_on:
       - db
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/xcelify
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_DATASOURCE_URL: jdbc:mysql://109.68.215.67:3306/default_db
+      SPRING_DATASOURCE_USERNAME: gen_user
+      SPRING_DATASOURCE_PASSWORD: root1234
     networks:
       - mynetwork
 
@@ -21,8 +21,8 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: xcelify
-      MYSQL_USER: root
-      MYSQL_PASSWORD: root
+      MYSQL_USER: gen_user
+      MYSQL_PASSWORD: root1234
     ports:
       - "3306:3306"
     networks:
