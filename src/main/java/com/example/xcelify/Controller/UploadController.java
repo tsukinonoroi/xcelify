@@ -35,7 +35,7 @@ public class UploadController {
                              @RequestParam("fileInternational") MultipartFile fileInternational,
                              Model model) throws IOException {
 
-        String uploadDir = "/xcelify/reports/notfilter";
+        String uploadDir = "./xcelify/reports/notfilter";
         File dest = new File(uploadDir);
 
         File parentDir = dest.getParentFile();
