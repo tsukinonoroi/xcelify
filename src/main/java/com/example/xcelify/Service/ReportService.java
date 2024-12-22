@@ -35,7 +35,7 @@ public class ReportService {
     private final HelperClass helperClass;
     private final CustomUserDetailService customUserDetailService;
     private String reportName;
-    private String filePath = "/root/xcelify/reports/filter";
+    private String filePath = "/xcelify/reports/filter";
     private String sourceRussianFilePath;
     private String sourceInternationalFilePath;
     //парсинг продуктов исходных файлов

@@ -33,7 +33,7 @@ import java.util.List;
 public class ReportController {
     private final CustomUserDetailService customUserDetailService;
     private final ReportRepository reportRepository;
-    private final String filePath = "/root/xcelify/reports/filter";
+    private final String filePath = "/xcelify/reports/filter";
 
 
     @GetMapping("/reports")
