@@ -8,16 +8,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.Date;
 import java.util.Map;
 @Service
 @Slf4j
 public class HelperClass {
 
-    // Метод для извлечения и преобразования даты в LocalDate
     public static LocalDate getDateCellValue(Cell cell) {
         if (cell == null) {
             return null;

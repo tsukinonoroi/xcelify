@@ -2,9 +2,7 @@ package com.example.xcelify.Model;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.Generated;
 import lombok.ToString;
-import org.springframework.context.annotation.Primary;
 
 import java.util.List;
 

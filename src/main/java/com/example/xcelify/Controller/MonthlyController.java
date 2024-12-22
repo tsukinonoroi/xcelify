@@ -1,28 +1,20 @@
 package com.example.xcelify.Controller;
 
-import com.example.xcelify.Service.HelperClass;
 import com.example.xcelify.Service.ReportService;
 import lombok.RequiredArgsConstructor;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
+
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
-import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
 public class MonthlyController {
 
     private final ReportService reportService;
-    private final String filePath = "C:/users/edemw/Desktop/filter";
+    private String filePath = "C:/users/edemw/Desktop/filter";
 
     @PostMapping("/monthly-report")
     public String generateMonthlyReport(

@@ -6,6 +6,7 @@ import com.example.xcelify.Repository.ReportRepository;
 import com.example.xcelify.Service.CustomUserDetailService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -33,6 +34,7 @@ public class ReportController {
     private final CustomUserDetailService customUserDetailService;
     private final ReportRepository reportRepository;
     private final String filePath = "C:/users/edemw/Desktop/filter";
+
 
     @GetMapping("/reports")
     public String getReports(Model model) {

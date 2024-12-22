@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,12 +22,13 @@ import java.util.*;
 
 @Slf4j
 @Controller
-@RequiredArgsConstructor
 @Data
+@RequiredArgsConstructor
 public class UploadController {
 
     private final ReportService reportService;
     private final ProductRepository productRepository;
+
 
     @PostMapping("/upload")
     public String uploadFile(@RequestParam("fileRussia") MultipartFile fileRussia,

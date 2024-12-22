@@ -7,11 +7,6 @@ import com.example.xcelify.Model.User;
 import java.util.Collection;
 
 
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-
-import java.util.Collection;
-
 @Data
 public class CustomUserDetails implements UserDetails {
     private String username;

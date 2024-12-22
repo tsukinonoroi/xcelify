@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,15 +20,14 @@ import java.io.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 @Data
+@RequiredArgsConstructor
 public class ReportService {
 
     private final ReportRepository reportRepository;
@@ -38,8 +38,6 @@ public class ReportService {
     private String filePath = "C:/users/edemw/Desktop/filter";
     private String sourceRussianFilePath;
     private String sourceInternationalFilePath;
-
-
     //парсинг продуктов исходных файлов
     @Transactional
     public Set<Product> parseUniqueProducts(File fileRussia, File fileInternational) throws IOException {
