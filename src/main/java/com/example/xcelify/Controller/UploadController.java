@@ -8,22 +8,15 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.server.ResponseStatusException;
-
 
 import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.file.Files;
 import java.util.*;
 
 @Slf4j
@@ -35,23 +28,33 @@ public class UploadController {
     private final ReportService reportService;
     private final ProductRepository productRepository;
 
-
     @PostMapping("/upload")
-    public String uploadFile(@RequestParam("file") MultipartFile file, Model model) throws IOException {
+    public String uploadFile(@RequestParam("fileRussia") MultipartFile fileRussia,
+                             @RequestParam("fileInternational") MultipartFile fileInternational,
+                             Model model) throws IOException {
 
-        String uploadDir = "C:\\Users\\edemw\\Desktop\\notfilter\\" + file.getOriginalFilename();
+        String uploadDir = "C:/Users/edemw/Desktop/notfilter";
         File dest = new File(uploadDir);
 
         File parentDir = dest.getParentFile();
         if (!parentDir.exists()) {
+            log.warn("Родительской папки не существует, создаем папку");
             parentDir.mkdirs();
         }
 
-        file.transferTo(dest);
+        String russianPath = uploadDir + "/" + fileRussia.getOriginalFilename();
+        String internationalPath = uploadDir + "/" + fileInternational.getOriginalFilename();
 
-        reportService.setSourceFilePath(uploadDir);
+        log.info("Сохраняем файл России по пути: " + russianPath);
+        log.info("Сохраняем файл International по пути: " + internationalPath);
 
-        Set<Product> productsWithCosts = reportService.parseUniqueProducts(dest);
+        fileRussia.transferTo(new File(russianPath));
+        fileInternational.transferTo(new File(internationalPath));
+
+        reportService.setSourceRussianFilePath(russianPath);
+        reportService.setSourceInternationalFilePath(internationalPath);
+
+        Set<Product> productsWithCosts = reportService.parseUniqueProducts(new File(russianPath), new File(internationalPath));
 
         List<Product> products = new ArrayList<>(productsWithCosts);
         model.addAttribute("products", products);
@@ -63,7 +66,7 @@ public class UploadController {
     public String updateCosts(@RequestParam Map<String, String> allParams) {
         Map<Long, Double> costsMap = new HashMap<>();
 
-        log.debug("Received parameters: {}", allParams);
+        log.debug("Проверенные параметры: {} ", allParams);
 
         allParams.forEach((key, value) -> {
             if (key.startsWith("costs[")) {
@@ -72,11 +75,11 @@ public class UploadController {
                     Long productId = Long.valueOf(idString.trim().replaceAll("[^\\d]", "")); // Удаляем пробелы из ID
                     Double cost = Double.valueOf(value.replaceAll("[^\\d.]", "").replace(",", "."));
 
-                    log.debug("Adding product ID: {}, cost: {}", productId, cost);
+                    log.info("Добавили продукт ID: {}, себестоимость: {}", productId, cost);
 
                     costsMap.put(productId, cost);
                 } catch (NumberFormatException e) {
-                    log.warn("Неверный формат ID или стоимости: ID={}, стоимость={}", idString, value);
+                    log.error("Неверный формат ID или стоимости: ID={}, стоимость={}", idString, value);
                 }
             }
         });
@@ -85,26 +88,75 @@ public class UploadController {
         return "redirect:/updateCosts";
     }
 
+    @PostMapping("/products/update")
+    public String updateCostsInProducts(@RequestParam Map<String, String> allParams) {
+        Map<Long, Double> costsMap = new HashMap<>();
+
+        log.debug("Проверенные параметры: {} ", allParams);
+
+        allParams.forEach((key, value) -> {
+            if (key.startsWith("costs[")) {
+                String idString = key.substring(6, key.length() - 1);
+                try {
+                    Long productId = Long.valueOf(idString.trim().replaceAll("[^\\d]", "")); // Удаляем пробелы из ID
+                    Double cost = Double.valueOf(value.replaceAll("[^\\d.]", "").replace(",", "."));
+
+                    log.info("Добавили продукт ID: {}, себестоимость: {}", productId, cost);
+
+                    costsMap.put(productId, cost);
+                } catch (NumberFormatException e) {
+                    log.error("Неверный формат ID или стоимости: ID={}, стоимость={}", idString, value);
+                }
+            }
+        });
+        reportService.updateCosts(costsMap);
+
+        return "redirect:/products";
+    }
+
     @PostMapping("/generateReport")
     public String generateReport(@RequestParam("reportName") String reportName) throws IOException {
 
         reportService.setReportName(reportName);
         reportService.generateNewReport(reportName);
 
-        File sourceFile = reportService.getSourceFile();
-        Set<Product> uniqueProducts = reportService.parseUniqueProducts(sourceFile);
+        File internationalFile = reportService.getInternationalFile();
+        File russianFile = reportService.getRussianFile();
+        Set<Product> uniqueProducts = reportService.parseUniqueProducts(internationalFile, russianFile);
 
         reportService.inputNameAndArticul(uniqueProducts);
         reportService.inputCountAndSale(uniqueProducts);
-        return "generateReport";
+        reportService.inputVozToNds(uniqueProducts);
+        reportService.inputUslToPlat(uniqueProducts);
+        reportService.inputOplToPrib(uniqueProducts);
+        reportService.addSummaryRowToFileWithExternalData();
+
+        return "redirect:/reports";
     }
+
+
+
+
     @GetMapping("/generateReport")
     public String generareReportGet() {
         return "generateReport";
     }
 
     @GetMapping("/updateCosts")
-    public String getUpdCost(Model model){
+    public String getUpdCost(Model model) {
+        try {
+            File internationalFile = reportService.getInternationalFile();
+            File russianFile = reportService.getRussianFile();
+
+            Set<Product> uniqueProducts = reportService.parseUniqueProducts(russianFile, internationalFile);
+            List<Product> uniqueProductsList = new ArrayList<>(uniqueProducts);
+            Collections.sort(uniqueProductsList, Comparator.comparing(Product::getName)); // Пример сортировки по имени
+            model.addAttribute("products", uniqueProductsList);
+
+        } catch (IOException e) {
+            log.error("Ошибка при загрузке исходного файла: ", e);
+            model.addAttribute("error", "Не удалось загрузить данные из файла.");
+        }
         return "enter_costs";
     }
 

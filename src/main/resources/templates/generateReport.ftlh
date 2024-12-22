@@ -4,72 +4,68 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Генерация отчета</title>
-    <link rel="stylesheet" type="text/css" href="/css/enter_costs.css">
+    <link rel="stylesheet" type="text/css" href="/css/main.css">
     <style>
-        /* Стиль для анимации */
-        .loader {
-            border: 8px solid #f3f3f3;
-            border-top: 8px solid #3498db;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 2s linear infinite;
-            margin: 20px auto;
-        }
-
-        /* Анимация вращения */
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        .content {
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
             text-align: center;
+            padding: 50px;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        .button-container {
+            margin-top: 50px;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #fff;
+            background: linear-gradient(45deg, #6a11cb, #2575fc);
+            border: none;
+            border-radius: 30px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .button:hover {
+            transform: scale(1.05);
+        }
+
+        .message {
             margin-top: 20px;
+            font-size: 16px;
+            color: #777;
+        }
+
+        /* Пульсация кнопки */
+        @keyframes pulse {
+            0% { box-shadow: 0 0 10px rgba(106, 17, 203, 0.8); }
+            50% { box-shadow: 0 0 20px rgba(106, 17, 203, 0.5); }
+            100% { box-shadow: 0 0 10px rgba(106, 17, 203, 0.8); }
+        }
+
+        .active-button {
+            animation: pulse 1.5s infinite;
         }
     </style>
 </head>
 <body>
-<div class="container">
-    <h1>Генерация отчета</h1>
-
-    <div class="content">
-        <!-- Показываем анимацию до тех пор, пока отчет не будет готов -->
-        <div id="loader" class="loader"></div>
-
-        <!-- Это сообщение будет показываться после завершения генерации -->
-        <div id="completedMessage" class="hidden">
-            <p>Отчет успешно сгенерирован!</p>
-            <a href="/some-link">Перейти к отчету</a>
-        </div>
-    </div>
-
+<h1>Генерация отчета завершена!</h1>
+<div class="button-container">
+    <a href="/reports" class="button active-button">Перейти к отчету</a>
+    <p class="message">Ваш отчет готов. Нажмите на кнопку, чтобы посмотреть его.</p>
 </div>
 
 <script>
-    // Функция для отображения анимации и скрытия содержимого
-    function showLoader() {
-        // Показываем анимацию
-        document.getElementById('loader').classList.remove('hidden');
-        // Скрываем сообщение о завершении генерации
-        document.getElementById('completedMessage').classList.add('hidden');
-    }
 
-    // Эта функция будет вызываться, когда отчет сгенерирован
-    function reportGenerated() {
-        // Скрываем анимацию
-        document.getElementById('loader').classList.add('hidden');
-        // Показываем сообщение о завершении
-        document.getElementById('completedMessage').classList.remove('hidden');
-    }
-
-    // Симуляция генерации отчета через 5 секунд для демонстрации
-    setTimeout(reportGenerated, 5000);  // Здесь можно поставить реальную логику
 </script>
-
 </body>
 </html>

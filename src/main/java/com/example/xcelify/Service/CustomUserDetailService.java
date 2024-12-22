@@ -5,6 +5,8 @@ import com.example.xcelify.Repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -23,10 +25,18 @@ public class CustomUserDetailService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByLogin(username);
         if (user == null) {
-            log.info("User not found");
+            log.error("Пользоавтель не найден!");
             throw new UsernameNotFoundException("User not found");
         }
-        log.info("User if found");
-        return new CustomUserDetails(user.getLogin(), user.getPassword(), Collections.emptyList());
+        log.info("Пользователь найден ");
+        return new CustomUserDetails(user);
+    }
+
+    public User getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
+            return ((CustomUserDetails) authentication.getPrincipal()).getUser();
+        }
+        throw new IllegalArgumentException("Пользователь не найден");
     }
 }

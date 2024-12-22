@@ -1,8 +1,9 @@
 package com.example.xcelify.Service;
 
+import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
+import com.example.xcelify.Model.User;
 import java.util.Collection;
 
 
@@ -11,10 +12,21 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 
+@Data
 public class CustomUserDetails implements UserDetails {
     private String username;
     private String password;
     private Collection<? extends GrantedAuthority> authorities;
+
+    private User user;
+
+
+    public CustomUserDetails(User user) {
+        this.user = user;
+        this.username = user.getLogin();
+        this.password = user.getPassword();
+        this.authorities = getAuthorities();
+    }
 
     public CustomUserDetails(String username, String password, Collection<? extends GrantedAuthority> authorities) {
         this.username = username;

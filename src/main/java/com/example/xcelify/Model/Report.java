@@ -3,7 +3,6 @@ package com.example.xcelify.Model;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -22,5 +21,12 @@ public class Report {
 
     @Column(name = "filePath")
     private String filePath;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+    @Transient
+    private String formattedDate;
 
 }

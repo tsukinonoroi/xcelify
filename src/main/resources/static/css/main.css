@@ -1,29 +1,187 @@
-/* styles.css */
 body {
     font-family: Arial, sans-serif;
+    background-color: #f4f7f6;
+    color: #333;
     margin: 0;
-    background-color: #ffffff;
-    color: #333333;
+    padding: 0;
 }
 
 .navbar {
-    display: flex;
+    justify-content: space-between;
     align-items: center;
     background-color: #2E8B57;
-    padding: 1em;
+    padding: 15px 25px;
 }
 
 .navbar a {
     color: #ffffff;
     text-decoration: none;
-    margin-right: 1.5em;
     font-weight: bold;
+    margin-right: 70px;
 }
 
 .navbar .logo {
-    font-size: 1.5em;
-    font-weight: 700;
+    font-size: 1.8em;
+    font-weight: bold;
     color: #ffffff;
+}
+
+.container {
+    max-width: 800px;
+    margin: 30px auto;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.section {
+    padding: 20px;
+    margin-bottom: 20px;
+    background: linear-gradient(145deg, #ffffff, #f3f3f3);
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.section:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+.section h2 {
+    font-size: 1.8em;
+    color: #2E8B57;
+    margin-bottom: 15px;
+    text-align: center;
+    font-weight: bold;
+    letter-spacing: 1.2px;
+    border-bottom: 2px solid rgba(46, 139, 87, 0.2); /* Тонкая линия под заголовком */
+    display: inline-block;
+    padding-bottom: 5px;
+}
+
+.section p {
+    margin: 12px 0; /* Чуть больше пространства между абзацами */
+    color: #333; /* Более насыщенный цвет для лучшей читаемости */
+    line-height: 1.8; /* Ещё больше увеличен межстрочный интервал для комфорта */
+    font-size: 1.1em; /* Чуть увеличенный размер текста */
+    font-family: "Arial", sans-serif; /* Добавление современного шрифта */
+    text-align: justify; /* Выравнивание текста по ширине */
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8); /* Лёгкая подсветка для придания объёма */
+    padding: 0 10px; /* Внутренние отступы для создания воздуха */
+    border-left: 4px solid #2E8B57; /* Цветной акцент в виде линии слева */
+    background: linear-gradient(145deg, #f9f9f9, #f0f0f0); /* Едва заметный градиент */
+    border-radius: 4px; /* Округлённые углы для блока текста */
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05); /* Внутренняя тень для глубины */
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.section p:hover {
+    transform: translateY(-2px); /* Лёгкий подъём при наведении */
+    box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.1), 0 2px 5px rgba(0, 0, 0, 0.1); /* Усиление тени */
+    background: linear-gradient(145deg, #ffffff, #f4f4f4); /* Более светлый градиент при наведении */
+}
+
+.section input[type="file"],
+.section input[type="text"],
+.section input[type="submit"] {
+    margin-top: 10px;
+    display: block;
+    width: 97%;
+    padding: 10px 15px;
+    font-size: 1em;
+    color: #333;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.section input[type="file"]:focus,
+.section input[type="text"]:focus,
+.section input[type="submit"]:focus {
+    outline: none;
+    border-color: #2E8B57;
+    box-shadow: 0 0 5px rgba(46, 139, 87, 0.5);
+}
+
+.section input[type="submit"] {
+    background: linear-gradient(90deg, #2E8B57, #3CB371);
+    color: #fff;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+}
+
+.section input[type="submit"]:hover {
+    background: linear-gradient(90deg, #3CB371, #2E8B57);
+    transform: translateY(-2px);
+}
+
+.section input[type="submit"]:active {
+    transform: translateY(1px);
+    background: #2E8B57;
+}
+
+.section:last-child {
+    margin-bottom: 0;
+}
+
+
+h1 {
+    font-size: 2em;
+    color: #2E8B57;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+form p {
+    font-size: 1.1em;
+    color: #555555;
+}
+
+input[type="file"] {
+    padding: 10px;
+    font-size: 1em;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+input[type="file"]:focus {
+    border-color: #2E8B57;
+    outline: none;
+}
+
+input[type="submit"] {
+    padding: 12px 20px;
+    font-size: 1.1em;
+    font-weight: bold;
+    color: #ffffff;
+    background-color: #2E8B57;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+input[type="submit"]:hover {
+    background-color: #1d5a38;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background-color: #ffffff;
+    color: #333333;
 }
 
 .container {
@@ -39,14 +197,43 @@ h1 {
     color: #2E8B57;
 }
 
-form input[type="file"] {
-    margin-top: 1em;
-    padding: 0.5em;
-    font-size: 1em;
-    color: #2E8B57;
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1.5em;
 }
 
-form input[type="submit"] {
+table th, table td {
+    border: 1px solid #dcdcdc;
+    padding: 10px;
+    text-align: left;
+}
+
+table th {
+    background-color: #2E8B57;
+    color: #ffffff;
+}
+
+table tr {
+    transition: background-color 0.3s;
+}
+
+table tr:hover {
+    background-color: #e6f9e6; /* Светло-зеленый фон при наведении */
+}
+
+table tr:nth-child(even) {
+    background-color: #f2f2f2; /* Светло-серый фон для четных строк */
+}
+
+input[type="number"] {
+    width: 80%; /* Занять всю ширину ячейки */
+    padding: 0.5em;
+    font-size: 1em;
+    color: #333333;
+}
+
+input[type="submit"] {
     margin-top: 1.5em;
     padding: 0.7em 1.5em;
     font-size: 1.1em;
@@ -57,6 +244,231 @@ form input[type="submit"] {
     cursor: pointer;
 }
 
-form input[type="submit"]:hover {
+input[type="submit"]:hover {
     background-color: #1d5a38;
+}
+
+.reports-container {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.report-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.report-item:last-child {
+    border-bottom: none;
+}
+
+.report-details {
+    flex: 1;
+    margin-left: 15px;
+}
+
+.report-details p {
+    margin: 5px 0;
+    color: #555;
+}
+
+.report-details p:first-child {
+    font-weight: bold;
+    color: #333;
+}
+
+.report-icon {
+    width: 60px;
+    height: 60px;
+}
+
+.download-button, .delete-button {
+    text-decoration: none;
+    color: white;
+    padding: 12px 20px; /* Единый отступ для одинакового размера */
+    border-radius: 10px; /* Более плавные края */
+    font-weight: 600; /* Полужирный текст для лучшей читаемости */
+    font-size: 16px; /* Единый размер текста */
+    display: inline-block; /* Обеспечиваем правильное выравнивание */
+    text-align: center; /* Текст по центру */
+    border: none; /* Убираем стандартную границу */
+    transition: all 0.3s ease; /* Плавный переход для всех эффектов */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* Больше объема за счет тени */
+    cursor: pointer; /* Указатель при наведении */
+    min-width: 120px; /* Устанавливаем минимальную ширину для одинакового размера */
+}
+
+.download-button {
+    background: linear-gradient(135deg, #2E8B57, #3CB371); /* Градиент для кнопки загрузки */
+}
+
+.download-button:hover {
+    background: linear-gradient(135deg, #3CB371, #2E8B57); /* Меняем градиент на противоположный */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25); /* Увеличиваем тень */
+    transform: translateY(-3px); /* Сильнее поднимаем кнопку */
+}
+
+.delete-button {
+    margin-left: 50px;
+    background: linear-gradient(135deg, #ff2400, #FF4500); /* Градиент для кнопки удаления */
+}
+
+.delete-button:hover {
+    background: linear-gradient(135deg, #ff7a4f, #ff2400); /* Меняем градиент на противоположный */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.25); /* Увеличиваем тень */
+    transform: translateY(-3px); /* Сильнее поднимаем кнопку */
+}
+
+.download-button:active, .delete-button:active {
+    transform: translateY(0); /* Возврат кнопки в исходное положение при клике */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Уменьшение тени */
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f7f6;
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #2E8B57;
+    padding: 15px 25px;
+}
+
+.navbar a {
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: bold;
+    margin-right: 70px;
+    font-size: 1.2em; /* Увеличен размер шрифта */
+    transition: transform 0.3s ease; /* Плавное изменение при наведении */
+}
+
+.navbar a:hover {
+    transform: translateY(-5px); /* Приподнимается на 5px при наведении */
+}
+
+.navbar .logo {
+    font-size: 2em; /* Увеличен размер логотипа */
+    font-weight: bold;
+    color: #ffffff;
+}
+
+.container {
+    max-width: 800px;
+    margin: 30px auto;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    font-size: 2em;
+    color: #2E8B57;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+form p {
+    font-size: 1.1em;
+    color: #555555;
+}
+
+input[type="file"] {
+    padding: 10px;
+    font-size: 1em;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+input[type="file"]:focus {
+    border-color: #2E8B57;
+    outline: none;
+}
+
+input[type="submit"] {
+    padding: 12px 20px;
+    font-size: 1.1em;
+    font-weight: bold;
+    color: #ffffff;
+    background-color: #2E8B57;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+input[type="submit"]:hover {
+    background-color: #1d5a38;
+}
+
+.reports-container {
+    margin: 0 auto;
+    max-width: 800px;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.report-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #ddd;
+    transition: background-color 0.3s, transform 0.3s;
+    border-radius: 8px; /* Закругление углов */
+}
+
+.report-item:last-child {
+    border-bottom: none;
+}
+
+.report-item:hover {
+    background-color: #f0f0f0; /* Светло-зеленый фон при наведении */
+    transform: translateY(-3px); /* Поднимает элемент при наведении */
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15); /* Увеличенная тень при наведении */
+}
+
+.report-details {
+    flex: 1;
+    margin-left: 15px;
+}
+
+.report-details p {
+    margin: 5px 0;
+    color: #555;
+}
+
+.report-details p:first-child {
+    font-weight: bold;
+    color: #333;
+}
+
+.report-icon {
+    width: 60px;
+    height: 60px;
 }
