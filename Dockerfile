@@ -5,7 +5,7 @@ FROM openjdk:21-jdk-slim
 WORKDIR /app
 
 # Копируем файл JAR в контейнер
-COPY target/xcelify-0.0.1-SNAPSHOT.jar /app/xcelify.jar
+COPY ./target/xcelify-0.0.1-SNAPSHOT.jar /app/xcelify.jar
 
 # Открываем порт для приложения
 EXPOSE 8080
