@@ -20,7 +20,7 @@ services:
     container_name: xcelify-db
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: xcelify
+      MYSQL_DATABASE: default_db
       MYSQL_USER: gen_user
       MYSQL_PASSWORD: root1234
     ports:
