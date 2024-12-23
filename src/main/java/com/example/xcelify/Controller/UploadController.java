@@ -35,34 +35,41 @@ public class UploadController {
                              @RequestParam("fileInternational") MultipartFile fileInternational,
                              Model model) throws IOException {
 
-        String uploadDir = "/var/reports/unfiltered";
-        File dest = new File(uploadDir);
+        // Указание директории для сохранения
+        String uploadDir = "/var/reports/notfilter";
+        File uploadDirectory = new File(uploadDir);
 
-        File parentDir = dest.getParentFile();
-        if (!parentDir.exists()) {
+        // Создание родительской папки, если она не существует
+        if (!uploadDirectory.exists()) {
             log.warn("Родительской папки не существует, создаем папку");
-            parentDir.mkdirs();
+            uploadDirectory.mkdirs();
         }
 
-        String russianPath = uploadDir + "/" + fileRussia.getOriginalFilename();
-        String internationalPath = uploadDir + "/" + fileInternational.getOriginalFilename();
+        // Преобразование MultipartFile в обычный файл на сервере
+        File russianFile = new File(uploadDirectory, fileRussia.getOriginalFilename());
+        File internationalFile = new File(uploadDirectory, fileInternational.getOriginalFilename());
 
-        log.info("Сохраняем файл России по пути: " + russianPath);
-        log.info("Сохраняем файл International по пути: " + internationalPath);
+        log.info("Сохраняем файл России по пути: " + russianFile.getAbsolutePath());
+        log.info("Сохраняем файл International по пути: " + internationalFile.getAbsolutePath());
 
-        fileRussia.transferTo(new File(russianPath));
-        fileInternational.transferTo(new File(internationalPath));
+        // Перенос содержимого из MultipartFile в File
+        fileRussia.transferTo(russianFile);
+        fileInternational.transferTo(internationalFile);
 
-        reportService.setSourceRussianFilePath(russianPath);
-        reportService.setSourceInternationalFilePath(internationalPath);
+        // Установка путей в сервис
+        reportService.setSourceRussianFilePath(russianFile.getAbsolutePath());
+        reportService.setSourceInternationalFilePath(internationalFile.getAbsolutePath());
 
-        Set<Product> productsWithCosts = reportService.parseUniqueProducts(new File(russianPath), new File(internationalPath));
+        // Парсинг продуктов с учетом файлов
+        Set<Product> productsWithCosts = reportService.parseUniqueProducts(russianFile, internationalFile);
 
+        // Преобразуем в список и передаем на фронтенд
         List<Product> products = new ArrayList<>(productsWithCosts);
         model.addAttribute("products", products);
 
         return "enter_costs";
     }
+
 
     @PostMapping("/updateCosts")
     public String updateCosts(@RequestParam Map<String, String> allParams) {
