@@ -36,7 +36,7 @@ public class UploadController {
                              Model model) throws IOException {
 
         // Указание директории для сохранения
-        String uploadDir = "/var/reports/notfilter";
+        String uploadDir = "/root/xcelify/notfilter";
         File uploadDirectory = new File(uploadDir);
 
         // Создание родительской папки, если она не существует

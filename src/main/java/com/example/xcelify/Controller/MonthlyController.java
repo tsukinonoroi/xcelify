@@ -14,7 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class MonthlyController {
 
     private final ReportService reportService;
-    private String filePath = "/var/reports/filtered";
+    private String filePath = "/root/xcelify/filter";
 
     @PostMapping("/monthly-report")
     public String generateMonthlyReport(
