@@ -35,7 +35,7 @@ public class UploadController {
                              @RequestParam("fileInternational") MultipartFile fileInternational,
                              Model model) throws IOException {
 
-        String uploadDir = "/home/reports/notfilter";
+        String uploadDir = "/var/reports/unfiltered";
         File dest = new File(uploadDir);
 
         File parentDir = dest.getParentFile();

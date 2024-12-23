@@ -35,7 +35,7 @@ public class ReportService {
     private final HelperClass helperClass;
     private final CustomUserDetailService customUserDetailService;
     private String reportName;
-    private String filePath = "/home/reports/filter";
+    private String filePath = "/var/reports/filtered";
     private String sourceRussianFilePath;
     private String sourceInternationalFilePath;
     //парсинг продуктов исходных файлов
